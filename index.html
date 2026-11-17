@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CHOCOGRID CAFE | Delicious Desserts & Waffles</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #160c07; color: #fdf5ec; -webkit-tap-highlight-color: transparent; }
+    .font-brand { font-family: 'Cinzel', serif; }
+    .gold-gradient { background: linear-gradient(135deg, #f3d08a 0%, #c89643 50%, #f3d08a 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .card-glass { background: linear-gradient(145deg, rgba(43, 24, 15, 0.9), rgba(29, 15, 9, 0.95)); border: 1px solid rgba(212, 163, 89, 0.22); }
+    .btn-gold { background: linear-gradient(135deg, #e5be73 0%, #b88332 100%); color: #1a0d06; font-weight: 700; transition: all 0.2s ease; }
+    .btn-gold:active { transform: scale(0.96); }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="pb-28">
+
+  <!-- =========================================================
+       1. EASY ADMIN SETTINGS (YAHAN SE OFFER AUR MENU BADLEIN)
+       ========================================================= -->
+  <script>
+    const CAFE_CONFIG = {
+      name: "CHOCOGRID CAFE",
+      phone: "8888968227", // WhatsApp Order Number (Yahan apna number badal sakte hain)
+      address: "Eidgah Main gate ke pas, bypass road, Karanja Lad",
+      // Top Offer Banner (Agar banner chupana ho to showBanner: false kar dein)
+      showBanner: true,
+      bannerText: "🎉 SPECIAL OFFER: Use code <b>CHOCO10</b> for 10% OFF on orders above ₹199!"
+    };
+
+    // Active Coupon Codes (Naya code jodne ke liye bas ek line add karein)
+    const PROMO_CODES = {
+      "CHOCO10": { type: "percent", value: 10, minOrder: 199, label: "10% Off" },
+      "FLAT30":  { type: "flat", value: 30, minOrder: 250, label: "₹30 Flat Off" },
+      "WELCOME": { type: "flat", value: 20, minOrder: 149, label: "₹20 Welcome Off" }
+    };
+
+    // Menu Items (Kisi item par discount dikhane ke liye 'oldPrice' daalein, warna null rakhein)
+    const MENU_ITEMS = [
+      {
+        id: 1, category: "Chocolate Bowl", name: "Double Chocolate Bowl",
+        desc: "Rich layered dark & milk melted chocolate indulgence.",
+        badge: "BESTSELLER",
+        variants: [
+          { size: "Small", price: 70, oldPrice: 90 }, // ₹90 kat kar ₹70 dikhega
+          { size: "Big", price: 130, oldPrice: 150 }
+        ]
+      },
+      {
+        id: 2, category: "Chocolate Bowl", name: "Triple Chocolate Bowl",
+        desc: "Decadent trio of dark, milk & white liquid chocolate.",
+        badge: "POPULAR",
+        variants: [
+          { size: "Small", price: 80, oldPrice: null },
+          { size: "Big", price: 140, oldPrice: null }
+        ]
+      },
+      {
+        id: 3, category: "Chocolate Bowl", name: "Oreo Chocolate Bowl",
+        desc: "Crunchy crushed Oreo cookies drowned in warm chocolate.",
+        badge: null,
+        variants: [
+          { size: "Small", price: 80, oldPrice: null },
+          { size: "Big", price: 140, oldPrice: 160 }
+        ]
+      },
+      {
+        id: 4, category: "Chocolate Bowl", name: "KitKat Chocolate Bowl",
+        desc: "Crispy KitKat wafer chunks layered with silky chocolate.",
+        badge: null,
+        variants: [
+          { size: "Small", price: 90, oldPrice: null },
+          { size: "Big", price: 150, oldPrice: null }
+        ]
+      },
+      {
+        id: 5, category: "Chocolate Bowl", name: "Nutella Chocolate Bowl",
+        desc: "Loaded with authentic creamy hazelnut Nutella spread.",
+        badge: "BIG BOWL ONLY",
+        variants: [
+          { size: "Big Bowl", price: 170, oldPrice: 199 }
+        ]
+      },
+      {
+        id: 6, category: "Chocolate Bowl", name: "Biscoff Chocolate Bowl",
+        desc: "Caramelized Lotus Biscoff spread & biscuit crunch.",
+        badge: "BIG BOWL ONLY",
+        variants: [
+          { size: "Big Bowl", price: 140, oldPrice: null }
+        ]
+      },
+      {
+        id: 7, category: "Chocolate Bowl", name: "Kunafa Chocolate Bowl",
+        desc: "Trending viral crispy pistachio Kunafa with rich chocolate.",
+        badge: "CHEF'S SPECIAL",
+        variants: [
+          { size: "Big Bowl", price: 180, oldPrice: 210 }
+        ]
+      },
+      {
+        id: 8, category: "Waffle (Single Layer)", name: "Double Chocolate Waffle",
+        desc: "Crispy golden single-layer waffle topped with double chocolate.",
+        badge: "POCKET FRIENDLY",
+        variants: [
+          { size: "Standard Serving", price: 69, oldPrice: 89 }
+        ]
+      },
+      {
+        id: 9, category: "Waffle (Single Layer)", name: "Triple Chocolate Waffle",
+        desc: "Warm crispy waffle loaded with three layers of chocolate drizzle.",
+        badge: "VALUE PICK",
+        variants: [
+          { size: "Standard Serving", price: 69, oldPrice: null }
+        ]
+      },
+      {
+        id: 10, category: "Waffle (Double Layer)", name: "Dark & Milk Chocolate Waffle",
+        desc: "Double-decker crispy waffle sandwiched with dark & milk chocolate.",
+        badge: null,
+        variants: [
+          { size: "Standard Serving", price: 110, oldPrice: null }
+        ]
+      },
+      {
+        id: 11, category: "Waffle (Double Layer)", name: "Nutella Waffle",
+        desc: "Generous filling of original Nutella inside a double-layer waffle.",
+        badge: "BESTSELLER",
+        variants: [
+          { size: "Standard Serving", price: 150, oldPrice: 170 }
+        ]
+      },
+      {
+        id: 12, category: "Waffle (Double Layer)", name: "Cookie Cream Waffle",
+        desc: "Double-layer waffle with white chocolate & crushed Oreo cookies.",
+        badge: null,
+        variants: [
+          { size: "Standard Serving", price: 120, oldPrice: null }
+        ]
+      }
+    ];
+  </script>
+
+  <!-- TOP OFFER MARQUEE / STRIP -->
+  <div id="topOfferBanner" class="hidden bg-gradient-to-r from-[#b88332] via-[#f3d08a] to-[#b88332] text-[#1a0d06] text-xs sm:text-sm py-2 px-3 text-center font-medium shadow-md">
+    <span id="bannerContent"></span>
+  </div>
+
+  <!-- HEADER -->
+  <header class="relative overflow-hidden border-b border-[#d4a359]/25 bg-gradient-to-b from-[#2c170d] via-[#1f1009] to-[#160c07] pt-6 pb-5 px-4 text-center">
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#d4a359]/15 border border-[#d4a359]/30 text-[#f3d08a] text-xs font-semibold tracking-wider uppercase mb-2">
+      <i class="fa-solid fa-mug-hot"></i> Freshly Made Desserts & Waffles
+    </div>
+    <h1 class="font-brand text-3xl sm:text-4xl font-extrabold tracking-wide gold-gradient" id="cafeTitle">CHOCOGRID CAFE</h1>
+    <p class="text-xs sm:text-sm text-[#d8c3ae] mt-1.5 max-w-md mx-auto">
+      <i class="fa-solid fa-location-dot text-[#e5be73] mr-1"></i> <span id="cafeAddress"></span>
+    </p>
+    <div class="flex flex-wrap justify-center gap-2.5 mt-4">
+      <a id="callBtn" href="#" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#2b180f] border border-[#d4a359]/40 text-[#f3d08a] text-xs font-semibold">
+        <i class="fa-solid fa-phone"></i> <span id="phoneDisplay"></span>
+      </a>
+      <a id="directWaBtn" href="#" target="_blank" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 text-xs font-semibold">
+        <i class="fa-brands fa-whatsapp text-sm"></i> Direct WhatsApp Order
+      </a>
+    </div>
+  </header>
+
+  <!-- SEARCH & CATEGORY TABS -->
+  <div class="sticky top-0 z-30 bg-[#160c07]/95 backdrop-blur-md border-b border-[#d4a359]/20 px-4 py-3 space-y-2.5">
+    <div class="relative max-w-xl mx-auto">
+      <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-[#a88c72] text-xs"></i>
+      <input type="text" id="searchInput" onkeyup="renderMenu()" placeholder="Search Nutella, Kunafa, Oreo, Biscoff, Waffle..." class="w-full pl-9 pr-4 py-2 rounded-xl bg-[#25140c] border border-[#d4a359]/30 text-sm text-[#fdf5ec] placeholder-[#8c7058] focus:outline-none focus:border-[#e5be73]">
+    </div>
+    <div id="categoryTabs" class="flex gap-2 overflow-x-auto no-scrollbar max-w-xl mx-auto"></div>
+  </div>
+
+  <!-- MENU CONTAINER -->
+  <main id="menuContainer" class="max-w-xl mx-auto px-4 pt-4 space-y-6"></main>
+
+  <!-- FOOTER -->
+  <footer class="text-center text-xs text-[#9e8269] mt-10 px-4 space-y-1">
+    <p class="font-brand text-[#d4a359] font-bold text-sm">CHOCOGRID CAFE</p>
+    <p id="footerAddress"></p>
+    <p>Order / Inquiry: <span id="footerPhone" class="text-[#f3d08a] underline"></span></p>
+  </footer>
+
+  <!-- FLOATING CART BAR -->
+  <div id="floatingCart" class="hidden fixed bottom-4 left-4 right-4 z-40 max-w-xl mx-auto">
+    <button onclick="openCartModal()" class="w-full btn-gold py-3.5 px-5 rounded-2xl shadow-2xl flex items-center justify-between text-sm">
+      <div class="flex items-center gap-2">
+        <span id="cartCountBadge" class="bg-[#1a0d06] text-[#f3d08a] px-2.5 py-0.5 rounded-lg text-xs font-bold">0 Items</span>
+        <span id="cartTotalBadge" class="font-extrabold text-base">₹0</span>
+      </div>
+      <span class="flex items-center gap-1.5 font-bold">View Cart & Order <i class="fa-solid fa-arrow-right"></i></span>
+    </button>
+  </div>
+
+  <!-- CART & CHECKOUT MODAL -->
+  <div id="cartModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-[#1f1009] border border-[#d4a359]/30 w-full max-w-lg rounded-t-3xl sm:rounded-3xl max-h-[90vh] overflow-y-auto p-5 space-y-4">
+      <div class="flex items-center justify-between border-b border-[#d4a359]/20 pb-3">
+        <div>
+          <h2 class="font-brand text-lg font-bold text-[#f3d08a]">YOUR ORDER CART</h2>
+          <p class="text-xs text-[#a88c72]">Apply coupon & send order on WhatsApp</p>
+        </div>
+        <button onclick="closeCartModal()" class="w-8 h-8 rounded-full bg-[#2d180e] text-[#f3d08a] flex items-center justify-center">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- CART ITEMS LIST -->
+      <div id="cartItemsList" class="space-y-2.5"></div>
+
+      <!-- PROMO CODE BOX -->
+      <div class="bg-[#28150c] border border-[#d4a359]/25 rounded-xl p-3 space-y-2">
+        <label class="text-xs font-semibold text-[#f3d08a] flex items-center gap-1.5">
+          <i class="fa-solid fa-tag"></i> Have a Promo / Offer Code?
+        </label>
+        <div class="flex gap-2">
+          <input type="text" id="promoInput" placeholder="e.g. CHOCO10 or FLAT30" class="flex-1 px-3 py-2 rounded-lg bg-[#160c07] border border-[#d4a359]/30 text-xs uppercase text-[#fdf5ec] focus:outline-none focus:border-[#e5be73]">
+          <button onclick="applyPromoCode()" id="applyPromoBtn" class="px-4 py-2 rounded-lg btn-gold text-xs">Apply</button>
+        </div>
+        <p id="promoMessage" class="text-xs hidden"></p>
+        <div class="flex flex-wrap gap-1.5 pt-1" id="availableCouponsHint"></div>
+      </div>
+
+      <!-- BILL SUMMARY -->
+      <div class="bg-[#25140c] rounded-xl p-3.5 space-y-1.5 text-xs border border-[#d4a359]/20">
+        <div class="flex justify-between text-[#d8c3ae]">
+          <span>Item Total</span>
+          <span id="billSubTotal">₹0</span>
+        </div>
+        <div id="discountRow" class="hidden flex justify-between text-emerald-400 font-semibold">
+          <span id="discountLabel">Coupon Discount</span>
+          <span id="billDiscount">- ₹0</span>
+        </div>
+        <div class="flex justify-between text-base font-extrabold text-[#f3d08a] border-t border-[#d4a359]/20 pt-2 mt-1">
+          <span>Grand Total</span>
+          <span id="billGrandTotal">₹0</span>
+        </div>
+      </div>
+
+      <!-- CUSTOMER DETAILS -->
+      <div class="space-y-2.5">
+        <p class="text-xs font-bold text-[#d4a359] uppercase tracking-wider">Customer Details</p>
+        <div class="grid grid-cols-2 gap-2">
+          <button type="button" onclick="setOrderType('Home Delivery')" id="btnDelivery" class="py-2 rounded-xl text-xs font-bold border border-[#e5be73] bg-[#e5be73] text-[#1a0d06]">Home Delivery</button>
+          <button type="button" onclick="setOrderType('Cafe Pickup')" id="btnPickup" class="py-2 rounded-xl text-xs font-bold border border-[#d4a359]/30 bg-[#25140c] text-[#d8c3ae]">Cafe Pickup</button>
+        </div>
+        <input type="text" id="custName" placeholder="Your Full Name *" class="w-full px-3.5 py-2.5 rounded-xl bg-[#25140c] border border-[#d4a359]/30 text-xs text-[#fdf5ec] focus:outline-none focus:border-[#e5be73]">
+        <input type="tel" id="custPhone" placeholder="Your Mobile Number *" class="w-full px-3.5 py-2.5 rounded-xl bg-[#25140c] border border-[#d4a359]/30 text-xs text-[#fdf5ec] focus:outline-none focus:border-[#e5be73]">
+        <textarea id="custAddress" rows="2" placeholder="Complete Delivery Address in Karanja Lad *" class="w-full px-3.5 py-2.5 rounded-xl bg-[#25140c] border border-[#d4a359]/30 text-xs text-[#fdf5ec] focus:outline-none focus:border-[#e5be73]"></textarea>
+        <input type="text" id="custNote" placeholder="Cooking instruction / note (Optional)" class="w-full px-3.5 py-2.5 rounded-xl bg-[#25140c] border border-[#d4a359]/30 text-xs text-[#fdf5ec] focus:outline-none focus:border-[#e5be73]">
+      </div>
+
+      <button onclick="placeWhatsAppOrder()" class="w-full py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg">
+        <i class="fa-brands fa-whatsapp text-lg"></i> Place Order on WhatsApp
+      </button>
+    </div>
+  </div>
+
+  <!-- APP LOGIC -->
+  <script>
+    let selectedCategory = "All Items";
+    let selectedVariants = {}; // itemId -> variantIndex
+    let cart = []; // { key, id, name, size, price, qty }
+    let appliedCode = null;
+    let orderType = "Home Delivery";
+
+    // Initialize Cafe Info
+    document.getElementById("cafeTitle").innerText = CAFE_CONFIG.name;
+    document.getElementById("cafeAddress").innerText = CAFE_CONFIG.address;
+    document.getElementById("footerAddress").innerText = CAFE_CONFIG.address;
+    document.getElementById("phoneDisplay").innerText = CAFE_CONFIG.phone;
+    document.getElementById("footerPhone").innerText = CAFE_CONFIG.phone;
+    document.getElementById("callBtn").href = `tel:${CAFE_CONFIG.phone}`;
+    document.getElementById("directWaBtn").href = `https://wa.me/91${CAFE_CONFIG.phone}?text=${encodeURIComponent("Hello Chocogrid Cafe! I want to place an order.")}`;
+
+    if (CAFE_CONFIG.showBanner) {
+      document.getElementById("topOfferBanner").classList.remove("hidden");
+      document.getElementById("bannerContent").innerHTML = CAFE_CONFIG.bannerText;
+    }
+
+    // Set default variants
+    MENU_ITEMS.forEach(item => { selectedVariants[item.id] = 0; });
+
+    function renderCategories() {
+      const cats = ["All Items", ...new Set(MENU_ITEMS.map(i => i.category))];
+      document.getElementById("categoryTabs").innerHTML = cats.map(c => `
+        <button onclick="selectCategory('${c}')" class="px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition ${selectedCategory === c ? 'btn-gold' : 'bg-[#25140c] text-[#d8c3ae] border border-[#d4a359]/25'}">
+          ${c}
+        </button>
+      `).join("");
+    }
+
+    function selectCategory(cat) {
+      selectedCategory = cat;
+      renderCategories();
+      renderMenu();
+    }
+
+    function selectVariant(itemId, vIdx) {
+      selectedVariants[itemId] = vIdx;
+      renderMenu();
+    }
+
+    function renderMenu() {
+      const q = document.getElementById("searchInput").value.toLowerCase();
+      const filtered = MENU_ITEMS.filter(item => {
+        const matchCat = selectedCategory === "All Items" || item.category === selectedCategory;
+        const matchSearch = item.name.toLowerCase().includes(q) || item.desc.toLowerCase().includes(q);
+        return matchCat && matchSearch;
+      });
+
+      const grouped = {};
+      filtered.forEach(item => {
+        if (!grouped[item.category]) grouped[item.category] = [];
+        grouped[item.category].push(item);
+      });
+
+      const container = document.getElementById("menuContainer");
+      if (filtered.length === 0) {
+        container.innerHTML = `<p class="text-center text-sm text-[#a88c72] py-10">No items matched your search.</p>`;
+        return;
+      }
+
+      container.innerHTML = Object.keys(grouped).map(cat => `
+        <section class="space-y-3">
+          <div class="border-b border-[#d4a359]/20 pb-1.5">
+            <h2 class="font-brand text-lg font-bold text-[#f3d08a] uppercase">${cat}</h2>
+          </div>
+          <div class="space-y-3">
+            ${grouped[cat].map(item => {
+              const vIdx = selectedVariants[item.id] || 0;
+              const variant = item.variants[vIdx];
+              const cartKey = `${item.id}_${variant.size}`;
+              const inCart = cart.find(c => c.key === cartKey);
+
+              return `
+                <div class="card-glass rounded-2xl p-4 space-y-3">
+                  <div class="flex justify-between items-start gap-2">
+                    <div>
+                      <h3 class="font-bold text-base text-[#fdf5ec]">${item.name}</h3>
+                      <p class="text-xs text-[#bfa68e] mt-0.5">${item.desc}</p>
+                    </div>
+                    ${item.badge ? `<span class="px-2 py-0.5 rounded-md bg-[#d4a359]/20 border border-[#d4a359]/40 text-[#f3d08a] text-[10px] font-bold whitespace-nowrap">${item.badge}</span>` : ''}
+                  </div>
+
+                  <div class="flex flex-wrap gap-2">
+                    ${item.variants.map((v, idx) => `
+                      <button onclick="selectVariant(${item.id}, ${idx})" class="px-3 py-1 rounded-lg text-xs font-semibold border transition ${vIdx === idx ? 'bg-[#f3d08a] text-[#1a0d06] border-[#f3d08a]' : 'bg-[#1a0d06]/70 text-[#d8c3ae] border-[#d4a359]/30'}">
+                        ${v.size} • ₹${v.price}
+                      </button>
+                    `).join("")}
+                  </div>
+
+                  <div class="flex items-center justify-between pt-1">
+                    <div>
+                      <span class="text-[11px] text-[#a88c72] block">Price</span>
+                      <div class="flex items-baseline gap-2">
+                        <span class="text-lg font-extrabold text-[#f3d08a]">₹${variant.price}</span>
+                        ${variant.oldPrice ? `<span class="text-xs text-[#9e8269] line-through">₹${variant.oldPrice}</span>` : ''}
+                        ${variant.oldPrice ? `<span class="text-[10px] font-bold text-emerald-400 bg-emerald-950/80 px-1.5 py-0.5 rounded">SAVE ₹${variant.oldPrice - variant.price}</span>` : ''}
+                      </div>
+                    </div>
+
+                    ${inCart ? `
+                      <div class="flex items-center gap-3 bg-[#f3d08a] text-[#1a0d06] px-3 py-1.5 rounded-xl font-bold text-sm">
+                        <button onclick="updateQty('${cartKey}', -1)">−</button>
+                        <span>${inCart.qty}</span>
+                        <button onclick="updateQty('${cartKey}', 1)">+</button>
+                      </div>
+                    ` : `
+                      <button onclick="addToCart(${item.id})" class="btn-gold px-4 py-2 rounded-xl text-xs flex items-center gap-1">
+                        <i class="fa-solid fa-plus"></i> Add
+                      </button>
+                    `}
+                  </div>
+                </div>
+              `;
+            }).join("")}
+     
